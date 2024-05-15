@@ -29,14 +29,14 @@ public class LicenseServiceController {
 
     @RequestMapping(value="/",method = RequestMethod.GET)
     public List<License> getLicenses( @PathVariable("organizationId") String organizationId) {
-        logger.debug("LicenseServiceController Correlation id: {}", UserContextHolder.getContext().getCorrelationId());
+        logger.debug("LicenseServiceController.getLicenses Correlation id: {}", UserContextHolder.getContext().getCorrelationId());
         return licenseService.getLicensesByOrg(organizationId);
     }
 
     @RequestMapping(value="/{licenseId}",method = RequestMethod.GET)
-    public License getLicenses( @PathVariable("organizationId") String organizationId,
+    public License getLicense( @PathVariable("organizationId") String organizationId,
                                 @PathVariable("licenseId") String licenseId) {
-
+        logger.debug("LicenseServiceController.getLicense Correlation id: {}", UserContextHolder.getContext().getCorrelationId());
         return licenseService.getLicense(organizationId, licenseId);
     }
 

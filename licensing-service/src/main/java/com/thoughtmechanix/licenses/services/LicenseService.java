@@ -2,6 +2,7 @@ package com.thoughtmechanix.licenses.services;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
+import com.netflix.hystrix.exception.HystrixRuntimeException;
 import com.thoughtmechanix.licenses.clients.OrganizationRestTemplateClient;
 import com.thoughtmechanix.licenses.config.ServiceConfig;
 import com.thoughtmechanix.licenses.model.License;
@@ -33,7 +34,7 @@ public class LicenseService {
 
     public License getLicense(String organizationId,String licenseId) {
         License license = licenseRepository.findByOrganizationIdAndLicenseId(organizationId, licenseId);
-
+        
         Organization org = getOrganization(organizationId);
 
         return license
@@ -44,8 +45,9 @@ public class LicenseService {
                 .withComment(config.getExampleProperty());
     }
 
-    @HystrixCommand
+    //@HystrixCommand
     private Organization getOrganization(String organizationId) {
+        logger.debug("LicenseService.getOrganization  Correlation id: {}", UserContextHolder.getContext().getCorrelationId());
         return organizationRestClient.getOrganization(organizationId);
     }
 
@@ -54,7 +56,10 @@ public class LicenseService {
 
       int randomNum = rand.nextInt((3 - 1) + 1) + 1;
 
-      if (randomNum==3) sleep();
+      if (randomNum==3){ 
+        logger.debug("Randomly sleeping");
+        sleep();
+      }
     }
 
     private void sleep(){
@@ -64,18 +69,20 @@ public class LicenseService {
             e.printStackTrace();
         }
     }
+    
+    
 
-    @HystrixCommand(//fallbackMethod = "buildFallbackLicenseList",
-            threadPoolKey = "licenseByOrgThreadPool",
-            threadPoolProperties =
-                    {@HystrixProperty(name = "coreSize",value="30"),
-                     @HystrixProperty(name="maxQueueSize", value="10")},
-            commandProperties={
-                     @HystrixProperty(name="circuitBreaker.requestVolumeThreshold", value="10"),
-                     @HystrixProperty(name="circuitBreaker.errorThresholdPercentage", value="75"),
-                     @HystrixProperty(name="circuitBreaker.sleepWindowInMilliseconds", value="7000"),
-                     @HystrixProperty(name="metrics.rollingStats.timeInMilliseconds", value="15000"),
-                     @HystrixProperty(name="metrics.rollingStats.numBuckets", value="5")}
+    @HystrixCommand(//fallbackMethod = "buildFallbackLicenseList"//,
+            // threadPoolKey = "licenseByOrgThreadPool",
+            // threadPoolProperties =
+            //         {@HystrixProperty(name = "coreSize",value="30"),
+            //          @HystrixProperty(name="maxQueueSize", value="10")},
+            // commandProperties={
+            //          @HystrixProperty(name="circuitBreaker.requestVolumeThreshold", value="10"),
+            //          @HystrixProperty(name="circuitBreaker.errorThresholdPercentage", value="75"),
+            //          @HystrixProperty(name="circuitBreaker.sleepWindowInMilliseconds", value="7000"),
+            //          @HystrixProperty(name="metrics.rollingStats.timeInMilliseconds", value="15000"),
+            //          @HystrixProperty(name="metrics.rollingStats.numBuckets", value="5")}
     )
     public List<License> getLicensesByOrg(String organizationId){
         logger.debug("LicenseService.getLicensesByOrg  Correlation id: {}", UserContextHolder.getContext().getCorrelationId());

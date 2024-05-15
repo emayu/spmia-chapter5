@@ -49,5 +49,12 @@ public class Organization {
         this.contactPhone = contactPhone;
     }
 
+    @Override
+    public String toString() {
+        return "Organization{" + "id=" + id + ", name=" + name + ", contactName=" + contactName + ", contactEmail=" + contactEmail + ", contactPhone=" + contactPhone + '}';
+    }
+    
+    
+
 
 }

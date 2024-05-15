@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @EnableEurekaClient
-@EnableCircuitBreaker
+@EnableCircuitBreaker //used for hystrix circuit braker
 public class Application {
     @LoadBalanced
     @Bean
